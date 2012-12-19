@@ -13,6 +13,8 @@ Puppet::Type.type(:package).provide :lazyapt, :parent => :apt, :source => :dpkg 
     unless version_available? @resource[:name], @resource[:version]
       update_packages
     end
+
+    install
   end
 
   def update_packages

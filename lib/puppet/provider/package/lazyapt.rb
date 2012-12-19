@@ -7,7 +7,7 @@ Puppet::Type.type(:package).provide :lazyapt, :parent => :apt, :source => :dpkg 
 
   has_feature :versionable
 
-  alias before_install, install
+  alias before_install install
 
   def before_install
     unless version_available? @resource[:name], @resource[:version]
@@ -26,12 +26,16 @@ Puppet::Type.type(:package).provide :lazyapt, :parent => :apt, :source => :dpkg 
   end
 
   def version_available?(name, version)
-    available_packages.has_key? name &&
-      available_packages[name].member? version
+    available_packages.has_key?(name) &&
+      available_packages[name].member?(version)
   end
 
   def available_packages
-    AVAILABLE_PACKAGES ||= generate_available_packages_map
+    if self.class.const_defined?(:AVAILABLE_PACKAGES)
+      self.AVAILABLE_PACKAGES
+    else
+      self.class.const_set(:AVAILABLE_PACKAGES, generate_available_packages_map)
+    end
   end
 
   def generate_available_packages_map
